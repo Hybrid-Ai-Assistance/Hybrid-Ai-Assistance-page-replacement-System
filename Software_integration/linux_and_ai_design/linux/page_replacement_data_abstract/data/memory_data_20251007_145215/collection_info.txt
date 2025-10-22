@@ -1,0 +1,6 @@
+Page Replacement Data Collection (No Sudo)
+Start Time: Tue Oct  7 14:52:15 UTC 2025
+Duration: 300 seconds
+Interval: 1 second
+VM Info: Linux DESKTOP-N00M686 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+Memory: MemTotal:        7795912 kB

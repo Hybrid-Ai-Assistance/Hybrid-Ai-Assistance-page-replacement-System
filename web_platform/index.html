@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.css">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="cursor">
+
+      </div>
+      <div id="cursorblur">
+
+      </div>
+
+  <div id="main">
+    
+    <div id="page">
+      <div id="nav">
+          <div id="login">
+            <a href="login.html">
+              <h1>Login</h1>
+            </a>
+          </div>
+          <div id="about">
+            <a href="/about.html">
+              <h1>About us</h1>
+            </a>
+          </div>
+          <div id="email">
+            <a href="">
+              <h1>Home</h1>
+            </a>
+          </div>
+          <div id="contact">
+            <a href="/signin.html">
+              <h1>Signup</h1>
+            </a>
+          </div>
+        </div>
+        <div id="middle">
+        <div id="right">
+          <div class="logo">
+            <img src="1Forhead.png" class="part part1">
+            <img src="2Right.png" class="part part2">
+            <img src="3Left.png" class="part part3">
+            <img src="4Middle.png" class="part part4">
+            <img src="5LLeft.png" class="part part5">
+            <img src="6LRight.png" class="part part6">
+            <img src="7LMiddle.png" class="part part7">
+            <img src="8Lower.png" class="part part8">
+             <img src="feo1.png" class="part part9">
+
+
+
+          </div>
+          <div class="getstart">
+            Get Start
+          </div>
+          
+
+         
+        
+        </div>
+        
+      </div> 
+        
+      </div>
+      <div id="pagem">
+             
+                  <h1>Hybrid AI-Assisted Page Replacement </h1>
+
+                  <H2>WELCOME TO RTU IT !</H2>
+                  <P>RTU Family   has a VErsatile talent in </P>
+
+            </div>
+      
+<!--   
+      <div id="page1">
+            
+        
+             <video src="Recording 2025-09-24 085813.mp4" muted ></video>
+             
+        </div> -->
+        <!-- <div id="page2">
+            <h1>Apple Vision Pro seamlessly blends <br> digital content with your physical space.</h1>
+            <video src="Recording 2025-09-24 085813.mp4" autoplay loop muted ></video> 
+        </div> -->
+        
+
+        
+        <div id="about-us">
+                        <img src="WhatsApp Image 2025-10-13 at 22.04.24_96f688de.jpg"/>
+                        <div id="about-us-in">
+                              <h3>About Us</h3>
+                              <p>When the OS experiences a page fault, it uses the I/O wait time to ask an AI predictor (GRU/LSTM) to produce a short, ordered multi-step prediction chain. The OS keeps running LRU as the fast critical path; the AI acts as an advisor whose suggestions are accepted only when a dynamic trust score (fusing per-page fuzzy μ, short term S, and long-term reality W) is high. Predictions are validated step-by-step and the system updates page-level and global trust using rewards/penalties.
+                              </p>
+                        </div>
+                        <img src="WhatsApp Image 2025-10-13 at 22.08.39_24fdb4b8.jpg"/>
+                  </div>
+                  <div id="cards-container">
+                        <div class="card" id="card1">
+                              <div class="overlay">
+                                    <h4> 4) When the model runs (activation policy)</h4>
+                                    <p>
+                                        
+
+Model runs only on page fault: when OS experiences a page fault and starts disk/SSD I/O, model uses that I/O wait time to generate a full prediction chain (one-shot multi-step). This avoids running the model on the critical path.
+
+Chain length is adaptive:
+
+chain_len = min(max_chain, floor(IO_time / model_time_per_prediction))
+Example: if IO_time = 100 μs, model_time_per_pred ≈ 5 μs → chain_len ≈ 20.
+                                    </p>
+                              </div>
+                        </div>
+                        <div class="card" id="card2">
+                              <div class="overlay">
+                                    <h4>2) What the model outputs</h4>
+                                    <p>
+                                         
+
+Ordered predicted pages: p = [p1, p2, p3, ...] (head is immediate next).
+
+Per-step confidences conf = [c1, c2, ...] (sigmoid outputs — fuzzy confidences).
+
+Optionally: model also outputs cp (immediate next) and long chain, and can produce per-prediction μ proposals.
+Model inputs: history, mu values for pages in history, and W (global reality weight) and S optionally.
+Implementation note: prefer GRU for faster inference with close accuracy; do multi-head output in one forward pass.
+                                    </p>
+                              </div>
+                        </div>
+                        <div class="card" id="card3">
+                              <div class="overlay">
+                                    <h4>6) Continuous chain usage & per-access behavior</h4>
+                                    <p>
+
+For every incoming page access (normal CPU access), follow:
+1. If q (active chain) exists → compare actual page c with q[0] (head).
+o If c == q[0] → Match: reward model, advance q (pop head). Update mu[c] and S. No LRU involvement.
+o If c != q[0] but page is in memory (no page fault) → Mismatch without fault: do NOT discard the chain; soft-penalize model trust W (or S) and continue (advance/adjust queues as described below).
+2. If a true page fault occurs (page not in memory) → follow Page Fault Handling (next section).
+This keeps the chain “alive” across soft mismatches; only a true page fault causes regeneration.?
+                                    </p>
+                              </div>
+                        </div>
+                  </div>
+                  <div id="green-div">
+                        <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-side.svg"
+                              alt="" />
+
+                        <h4>SIGN UP to use awesome feature of operating system</h4>
+                        <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-side.svg"
+                              alt="" />
+
+                  </div>
+
+            
+            <div id="page3">
+                  <h4>EXCELLENT COUPLE OF HOURS,RELAX AND ENJOY INTHE FUN.SYUFF WERE ACCOMMODATING,REIENDLY AND VERY
+                        HELPFUL.CAFE ON SITE FOR REPRESENTATION ETC. aoperating iperfnfjelfkepfokf;elfk</h4>
+                  <img id="colon1"
+                        src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/quote-left.svg" alt="" />
+                  <img id="colon2"
+                        src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/quote-right.svg"
+                        alt="" />
+
+            </div>
+        <div id="page4">
+                  <h1>what are you waiting for</h1>
+                  <div id="elem">
+                        <h2>HIBRID</h2>
+                        <img src="WhatsApp Image 2025-10-13 at 22.04.22_30905d67.jpg"
+                              alt="" />
+
+
+                  </div>
+                  <div id="elem">
+                        <h2>PAGE</h2>
+                        <img src="WhatsApp Image 2025-10-13 at 22.04.24_96f688de.jpg"
+                              alt="" />
+
+
+
+                  </div>
+                  <div id="elem">
+                        <h2>Replacement</h2>
+                        <img src="WhatsApp Image 2025-10-13 at 22.08.39_24fdb4b8.jpg"/>
+
+                  </div>
+            </div>
+            <div id="footer">
+                  <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-footer.svg" alt="" />
+                  <div id="f1">
+                        <img src="feo1.png" alt="" />
+                  </div>
+                  <div id="f2">
+                        <h3>Naman Sehra</h3>
+                        <h3>Shuibham Garg</h3>
+                        <h3>Hemant </h3>
+                  </div>
+                  <div id="f3">
+                        <h3>LinkedIn</h3>
+                        <h3>Twitter</h3>
+                        <h3>Contact us</h3>
+                  </div>
+                  <div id="f4">
+                        <h4>
+                              H1,shubham garg <br />
+                              =Bhadana shadan <br />
+                              KT h5<br />
+                              tank house <br />
+                              TEL: 0208 309 0181 <br />
+                              GET DIRECTIONS <br />
+                        </h4>
+                  </div>
+            </div>
+
+
+
+
+
+
+
+
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/gsap.min.js" integrity="sha512-qF6akR/fsZAB4Co1QDDnUXWnaQseLGXoniuSuSlPQK6+aWhlMZcHzkasCSlnWoe+TJuudlka1/IQ01Dnhgq95g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/ScrollTrigger.min.js" integrity="sha512-IHDCHrefnBT3vOCsvdkMvJF/MCPz/nBauQLzJkupa4Gn4tYg5a6VGyzIrjo6QAUy3We5HFOZUlkUpP0dkgE60A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="sf.js"></script>
+</body>
+
+</html> 

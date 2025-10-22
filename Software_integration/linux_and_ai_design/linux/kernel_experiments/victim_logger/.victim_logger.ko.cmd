@@ -1,0 +1,1 @@
+savedcmd_/media/sf_kernel_code/kernel_experiments/victim_logger/victim_logger.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /media/sf_kernel_code/kernel_experiments/victim_logger/victim_logger.ko /media/sf_kernel_code/kernel_experiments/victim_logger/victim_logger.o /media/sf_kernel_code/kernel_experiments/victim_logger/victim_logger.mod.o

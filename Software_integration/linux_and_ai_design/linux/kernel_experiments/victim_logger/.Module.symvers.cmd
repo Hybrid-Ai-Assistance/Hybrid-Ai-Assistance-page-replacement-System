@@ -1,1 +1,0 @@
-savedcmd_/media/sf_kernel_code/kernel_experiments/victim_logger/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /media/sf_kernel_code/kernel_experiments/victim_logger/Module.symvers -T /media/sf_kernel_code/kernel_experiments/victim_logger/modules.order -i Module.symvers -e 

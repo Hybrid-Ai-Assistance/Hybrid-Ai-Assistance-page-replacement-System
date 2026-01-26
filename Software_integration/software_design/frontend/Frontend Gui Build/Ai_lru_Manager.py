@@ -47,6 +47,8 @@ class AILRUBackend:
         self.cache_size = 0
         self.max_cache_size = 1000
         self.memory_saved = 45
+        # GPU temperature simulation
+        self.gpu_temp_base = 40
         
     def get_stats(self):
         hit_rate = (self.cache_hits / self.total_operations * 100) if self.total_operations > 0 else 0
@@ -85,7 +87,7 @@ class MainWindow(QMainWindow):
         
         # Create backend AFTER window setup
         self.backend = AILRUBackend()
-        
+        self.setup_backend()
         # Set window icon
         self.setup_icon()
         self._setup_ui()
@@ -111,6 +113,187 @@ class MainWindow(QMainWindow):
         self.telemetry_timer.timeout.connect(self.update_telemetry)
         self.telemetry_timer.start(2000)
 
+    def setup_backend(self):
+        """Setup backend data connection"""
+        self.backend_timer = QTimer()
+        self.backend_timer.timeout.connect(self.update_from_backend)
+        self.backend_timer.start(2000)  # Har 2 second me update hoga
+        
+        # Initial update
+        self.update_from_backend()
+
+    def update_from_backend(self):
+        """Update UI with real backend data"""
+        try:
+            # Get data from backend
+            processes = self.get_real_process_data()
+            
+            # Update processes table
+            self.update_processes_table(processes)
+
+            # Update performance metrics - YEH LINE ADD KARO
+            self.update_performance_metrics()
+            
+        except Exception as e:
+            print(f"Backend update error: {e}")
+    
+    def get_real_process_data(self):
+        """Get real process data from system"""
+        try:
+            import psutil
+            processes = []
+            
+            for proc in psutil.process_iter(['name', 'memory_info', 'cpu_percent']):
+                try:
+                    # Memory in MB me convert karo
+                    memory_mb = proc.info['memory_info'].rss / 1024 / 1024
+                    
+                    # CPU percentage
+                    cpu_percent = proc.info['cpu_percent'] or 0
+                    
+                    # Aapke UI format me data banayo
+                    process_info = (
+                        proc.info['name'],
+                        "0 Mbps",
+                        f"{cpu_percent:.1f}%",
+                        f"{memory_mb:.1f} MB",
+                        "0 Mbps", 
+                        "0%"
+                    )
+                    processes.append(process_info)
+                except:
+                    continue
+            
+            # Memory ke hisab se sort karo (zada memory wale pehle)
+            processes.sort(key=lambda x: float(x[3].split()[0]), reverse=True)
+            return processes[:25]  # Sirf top 25 processes dikhao
+            
+        except ImportError:
+            # Agar psutil na ho toh sample data use karo
+            return self.get_sample_processes()
+
+    def update_processes_table(self, processes):
+        """Update processes table with real data"""
+        self.table.setRowCount(len(processes))
+        
+        for row, (name, network, cpu, memory, disk, gpu) in enumerate(processes):
+            self.table.setItem(row, 0, QTableWidgetItem(name))
+            self.table.setItem(row, 1, QTableWidgetItem(network))
+            self.table.setItem(row, 2, QTableWidgetItem(cpu))
+            self.table.setItem(row, 3, QTableWidgetItem(memory))
+            self.table.setItem(row, 4, QTableWidgetItem(disk))
+            self.table.setItem(row, 5, QTableWidgetItem(gpu))
+
+    def get_sample_processes(self):
+        """Sample data fallback"""
+        return [
+            ("System", "0 Mbps", "0.1%", "12.5 MB", "0 Mbps", "0%"),
+            ("svchost.exe (4)", "0 Mbps", "0.5%", "45.2 MB", "0 Mbps", "0%"),
+            ("chrome.exe (8)", "0.5 Mbps", "3.2%", "320.1 MB", "0 Mbps", "2%"),
+            ("python.exe", "0 Mbps", "1.5%", "89.3 MB", "0 Mbps", "0%"),
+            ("explorer.exe", "0 Mbps", "0.8%", "67.2 MB", "0 Mbps", "1%"),
+        ]
+    
+    def get_real_performance_metrics(self):
+        """Get real performance metrics from system"""
+        try:
+            import psutil
+            
+            # CPU Metrics
+            cpu_percent = psutil.cpu_percent(interval=0.1)
+            cpu_freq = psutil.cpu_freq()
+            cpu_speed = f"{cpu_freq.current/1000:.2f} GHz" if cpu_freq else "N/A"
+            
+            # Memory Metrics
+            memory = psutil.virtual_memory()
+            memory_used_gb = memory.used / (1024**3)  # Convert to GB
+            memory_total_gb = memory.total / (1024**3)
+            memory_percent = memory.percent
+            
+            # Disk Metrics
+            disk = psutil.disk_usage('/')
+            disk_percent = disk.percent
+            
+            # Network Metrics
+            net_io = psutil.net_io_counters()
+            network_send_mbps = (net_io.bytes_sent * 8) / (1024**2)  # Convert to Mbps
+            network_recv_mbps = (net_io.bytes_recv * 8) / (1024**2)
+            
+            return {
+                'cpu_percent': cpu_percent,
+                'cpu_speed': cpu_speed,
+                'memory_used': memory_used_gb,
+                'memory_total': memory_total_gb,
+                'memory_percent': memory_percent,
+                'disk_percent': disk_percent,
+                'network_send': network_send_mbps,
+                'network_recv': network_recv_mbps,
+                'memory_available': memory.available / (1024**3),
+                'memory_cached': getattr(memory, 'cached', 0) / (1024**3) if hasattr(memory, 'cached') else 0
+            }
+            
+        except ImportError:
+            # Fallback data if psutil not available
+            return self.get_sample_performance_metrics()
+
+    def get_sample_performance_metrics(self):
+        """Sample performance data fallback"""
+        return {
+            'cpu_percent': 5.5,
+            'cpu_speed': "1.76 GHz",
+            'memory_used': 8.3,
+            'memory_total': 15.4,
+            'memory_percent': 54,
+            'disk_percent': 1,
+            'network_send': 0.5,
+            'network_recv': 0.8,
+            'memory_available': 7.1,
+            'memory_cached': 5.7
+        }
+
+    def update_performance_metrics(self):
+        """Update performance tab with real metrics"""
+        try:
+            metrics = self.get_real_performance_metrics()
+            
+            # CPU Section Update
+            self.cpu_util_label.setText(f"{metrics['cpu_percent']:.1f}%")
+            self.cpu_speed_label.setText(metrics['cpu_speed'])
+            
+            # Memory Section Update
+            memory_used = metrics['memory_used']
+            memory_total = metrics['memory_total']
+            memory_percent = metrics['memory_percent']
+            self.memory_usage_label.setText(f"{memory_used:.1f}/{memory_total:.1f} GB ({memory_percent:.0f}%)")
+            
+            # Disk Section Update
+            self.disk_usage_label.setText(f"{metrics['disk_percent']}%")
+            
+            # Network Section Update
+            self.network_usage_label.setText(f"S-{metrics['network_send']:.1f} R-{metrics['network_recv']:.1f} Mbps")
+            
+            # GPU Section Update (simulated)
+            gpu_usage = min(100, max(0, metrics['cpu_percent'] + random.randint(-2, 2)))
+            gpu_temp = random.randint(40, 45)
+            self.gpu_usage_label.setText(f"{gpu_usage}%")
+            self.gpu_temp_label.setText(f"{gpu_temp} °C")
+            
+            # Memory Composition Update
+            self.in_use_label.setText(f"{memory_used:.1f} GB (0 MB)")
+            self.available_label.setText(f"{metrics['memory_available']:.1f} GB")
+            self.committed_label.setText(f"{memory_used + 2:.1f}/19.9 GB")  # Simulated
+            self.cached_label.setText(f"{metrics['memory_cached']:.1f} GB")
+            
+            # AI Cache Performance Update
+            stats = self.backend.get_stats()
+            self.hit_rate_label.setText(f"{stats['hit_rate']:.1f}%")
+            self.accuracy_label.setText(f"{min(100, stats['hit_rate'] + 5):.1f}%")
+            self.saved_label.setText(f"{stats['memory_saved']} MB")
+            self.active_label.setText(f"{len(self.get_real_process_data())}")
+            
+        except Exception as e:
+            print(f"Performance metrics update error: {e}")
+            
     def apply_theme(self):
         """Apply Windows Task Manager theme"""
         theme = TaskManagerTheme.COLORS
@@ -404,41 +587,9 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(tab, "Processes")
 
     def populate_processes_table(self):
-        """Populate processes table with Windows Task Manager style data"""
-        processes = [
-            ("Search (3)", "0 Mbps", "0%", "237.1 MB", "0 Mbps", "0%"),
-            ("Phone Link (3)", "0 Mbps", "0%", "118.4 MB", "0 Mbps", "0%"),
-            ("Desktop Window Manager", "0 Mbps", "0.5%", "60.0 MB", "0 Mbps", "0.5%"),
-            ("Task Manager", "0 Mbps", "5.5%", "56.8 MB", "0.1 Mbps", "0%"),
-            ("CIT Leader", "0 Mbps", "0%", "56.6 MB", "0 Mbps", "0%"),
-            ("Start (2)", "0 Mbps", "0%", "51.7 MB", "0 Mbps", "0%"),
-            ("Secure System", "0 Mbps", "0%", "47.9 MB", "0 Mbps", "0%"),
-            ("Service Host: Clipboard User S...", "0 Mbps", "0%", "45.2 MB", "0 Mbps", "0%"),
-            ("Microsoft Windows Search Hub...", "0 Mbps", "0%", "39.4 MB", "0 Mbps", "0%"),
-            ("Microsoft Office Quick-to-Burn L...", "0 Mbps", "0%", "32.1 MB", "0 Mbps", "0%"),
-            ("Service Host: UtcSrc", "0 Mbps", "0%", "38.2 MB", "0 Mbps", "0%"),
-            ("Mobile devices (2)", "0 Mbps", "0%", "28.8 MB", "0 Mbps", "0%"),
-            ("Service Host: Diagnostic Policy...", "0 Mbps", "0%", "25.8 MB", "0 Mbps", "0%"),
-            ("waspprs", "0 Mbps", "0%", "18.4 MB", "0 Mbps", "0%"),
-            ("LocalServiceNotNetworkHome...", "0 Mbps", "0%", "14.7 MB", "0 Mbps", "0%"),
-            ("Service Host: Windows Event L...", "0 Mbps", "0%", "12.9 MB", "0 Mbps", "0%"),
-            ("Service Host: State Reporting ...", "0 Mbps", "0%", "12.7 MB", "0 Mbps", "0%"),
-            ("Microsoft OneDriveFile Co-Au...", "0 Mbps", "0%", "12.2 MB", "0 Mbps", "0%"),
-            ("Service Host: Local System", "0 Mbps", "0%", "11.9 MB", "0 Mbps", "0%"),
-            ("Microsoft Network Realtime In...", "0 Mbps", "0%", "11.1 MB", "0 Mbps", "0%"),
-            ("Local Security Authority Proce...", "0 Mbps", "0%", "9.9 MB", "0 Mbps", "0%"),
-            ("Registry", "0 Mbps", "0%", "9.7 MB", "0 Mbps", "0%"),
-            ("Service Host: DCOM Server Pr...", "0 Mbps", "0%", "9.4 MB", "0 Mbps", "0%")
-        ]
-        
-        self.table.setRowCount(len(processes))
-        for row, (name, network, cpu, memory, disk, gpu) in enumerate(processes):
-            self.table.setItem(row, 0, QTableWidgetItem(name))
-            self.table.setItem(row, 1, QTableWidgetItem(network))
-            self.table.setItem(row, 2, QTableWidgetItem(cpu))
-            self.table.setItem(row, 3, QTableWidgetItem(memory))
-            self.table.setItem(row, 4, QTableWidgetItem(disk))
-            self.table.setItem(row, 5, QTableWidgetItem(gpu))
+        """Populate processes table with real data"""
+        processes = self.get_real_process_data()
+        self.update_processes_table(processes)
 
     def _setup_performance_tab(self):
         """Setup performance monitoring tab with Windows Task Manager style"""
@@ -830,41 +981,45 @@ class MainWindow(QMainWindow):
         self.performance_timer.timeout.connect(self.update_performance_metrics)
         self.performance_timer.start(1000)
 
-    def update_performance_metrics(self):
-        """Update performance metrics with realistic values"""
-        # Simulate realistic fluctuations
-        cpu_util = max(1, min(100, random.randint(2, 8)))  # 2-8% range
-        cpu_speed = round(1.5 + random.random() * 0.8, 2)  # 1.5-2.3 GHz range
-        
-        memory_used = round(8.5 + random.random() * 2, 1)  # 8.5-10.5 GB range
-        memory_total = 15.4
-        memory_percent = int((memory_used / memory_total) * 100)
-        
-        disk_usage = random.randint(0, 3)  # 0-3% range
-        network_send = random.randint(0, 5)
-        network_recv = random.randint(0, 5)
-        gpu_usage = random.randint(0, 3)  # 0-3% range
-        gpu_temp = random.randint(40, 45)  # 40-45°C range
+        self.performance_timer = QTimer()
+        self.performance_timer.timeout.connect(self.update_performance_metrics)
+        self.performance_timer.start(1000)
 
-        # Update labels
-        self.cpu_util_label.setText(f"{cpu_util}%")
-        self.cpu_speed_label.setText(f"{cpu_speed} GHz")
-        self.memory_usage_label.setText(f"{memory_used}/{memory_total} GB ({memory_percent}%)")
-        self.disk_usage_label.setText(f"{disk_usage}%")
-        self.network_usage_label.setText(f"S-{network_send} R-{network_recv} Mbps")
-        self.gpu_usage_label.setText(f"{gpu_usage}%")
-        self.gpu_temp_label.setText(f"{gpu_temp} °C")
+    # def update_performance_metrics(self):
+    #     """Update performance metrics with realistic values"""
+    #     # Simulate realistic fluctuations
+    #     cpu_util = max(1, min(100, random.randint(2, 8)))  # 2-8% range
+    #     cpu_speed = round(1.5 + random.random() * 0.8, 2)  # 1.5-2.3 GHz range
         
-        # Update memory composition (simulate small changes)
-        in_use = memory_used
-        available = round(memory_total - memory_used, 1)
-        committed = round(10.3 + random.random() * 0.4, 1)
-        cached = round(5.5 + random.random() * 0.4, 1)
+    #     memory_used = round(8.5 + random.random() * 2, 1)  # 8.5-10.5 GB range
+    #     memory_total = 15.4
+    #     memory_percent = int((memory_used / memory_total) * 100)
         
-        self.in_use_label.setText(f"{in_use} GB (0 MB)")
-        self.available_label.setText(f"{available} GB")
-        self.committed_label.setText(f"{committed}/19.9 GB")
-        self.cached_label.setText(f"{cached} GB")
+    #     disk_usage = random.randint(0, 3)  # 0-3% range
+    #     network_send = random.randint(0, 5)
+    #     network_recv = random.randint(0, 5)
+    #     gpu_usage = random.randint(0, 3)  # 0-3% range
+    #     gpu_temp = random.randint(40, 45)  # 40-45°C range
+
+    #     # Update labels
+    #     self.cpu_util_label.setText(f"{cpu_util}%")
+    #     self.cpu_speed_label.setText(f"{cpu_speed} GHz")
+    #     self.memory_usage_label.setText(f"{memory_used}/{memory_total} GB ({memory_percent}%)")
+    #     self.disk_usage_label.setText(f"{disk_usage}%")
+    #     self.network_usage_label.setText(f"S-{network_send} R-{network_recv} Mbps")
+    #     self.gpu_usage_label.setText(f"{gpu_usage}%")
+    #     self.gpu_temp_label.setText(f"{gpu_temp} °C")
+        
+    #     # Update memory composition (simulate small changes)
+    #     in_use = memory_used
+    #     available = round(memory_total - memory_used, 1)
+    #     committed = round(10.3 + random.random() * 0.4, 1)
+    #     cached = round(5.5 + random.random() * 0.4, 1)
+        
+    #     self.in_use_label.setText(f"{in_use} GB (0 MB)")
+    #     self.available_label.setText(f"{available} GB")
+    #     self.committed_label.setText(f"{committed}/19.9 GB")
+    #     self.cached_label.setText(f"{cached} GB")
 
     def _setup_ai_control_tab(self):
         """Setup AI control and configuration tab"""
@@ -1169,7 +1324,7 @@ if __name__ == "__main__":
 
     # Apply modern styling
     app.setStyle("Fusion")
-
+    
     window = MainWindow()
     window.show()
     

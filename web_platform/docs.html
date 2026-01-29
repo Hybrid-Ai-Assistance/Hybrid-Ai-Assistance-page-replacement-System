@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Documentation - Hybrid AI-Assisted Page Replacement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    /* Custom styles for cursor and animations */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      scroll-behavior: smooth;
+    }
+    
+    #cursor {
+      height: 25px;
+      width: 25px;
+      background-color: rgb(235, 232, 232);
+      border-radius: 50%;
+      z-index: 99;
+      position: fixed;
+      transition: all 0.1s ease-out;
+      pointer-events: none;
+    }
+    
+    #cursorblur {
+      height: 250px;
+      width: 250px;
+      background-color: rgba(233, 228, 228, 0.3);
+      border-radius: 50%;
+      z-index: 99;
+      position: fixed;
+      filter: blur(50px);
+      transition: all 0.4s ease-out;
+      pointer-events: none;
+    }
+    
+    #main {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #page {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      background-color: #efecec;
+      background-image: url('https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    
+    /* Progress bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 4px;
+      background: linear-gradient(90deg, #95c11e, #2f332e);
+      z-index: 100;
+      transition: width 0.1s ease;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #95c11e;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #7ea818;
+    }
+    
+    /* Scroll-triggered animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+    
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .slide-in-left {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.8s ease;
+    }
+    
+    .slide-in-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .slide-in-right {
+      opacity: 0;
+      transform: translateX(50px);
+      transition: all 0.8s ease;
+    }
+    
+    .slide-in-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .scale-in {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.8s ease;
+    }
+    
+    .scale-in.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    /* Text stroke effect */
+    .text-stroke {
+      -webkit-text-stroke: 2px #b6e92a;
+      color: transparent;
+    }
+    
+    /* Scrolling text animation */
+    @keyframes scroll {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-100%);
+      }
+    }
+    
+    .scrolling-text {
+      animation: scroll 20s linear infinite;
+    }
+    
+    /* Parallax effect */
+    .parallax {
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    
+    /* Documentation specific styles */
+    .docs-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 300px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 100px 20px 40px;
+      overflow-y: auto;
+      z-index: 40;
+      transition: transform 0.3s ease;
+    }
+    
+    .docs-content {
+      margin-left: 300px;
+      padding: 100px 40px 40px;
+      min-height: 100vh;
+      background: #f8fafc;
+    }
+    
+    .docs-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #95c11e;
+    }
+    
+    .docs-section h2 {
+      color: #1e293b;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .docs-section h3 {
+      color: #334155;
+      font-size: 1.4rem;
+      margin: 25px 0 15px;
+    }
+    
+    .docs-section p {
+      color: #475569;
+      line-height: 1.7;
+      margin-bottom: 15px;
+    }
+    
+    .docs-section ul, .docs-section ol {
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .docs-section li {
+      color: #475569;
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+    
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+    }
+    
+    .nav-item {
+      padding: 12px 15px;
+      margin-bottom: 5px;
+      border-radius: 8px;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-item:hover, .nav-item.active {
+      background: rgba(149, 193, 30, 0.1);
+      color: #95c11e;
+    }
+    
+    .nav-item i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: #95c11e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 1024px) {
+      .docs-sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .docs-sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .docs-content {
+        margin-left: 0;
+        padding: 100px 20px 40px;
+      }
+      
+      .mobile-menu-btn {
+        display: block;
+      }
+    }
+    
+    /* Table styles */
+    .docs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    
+    .docs-table th, .docs-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .docs-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 600;
+    }
+    
+    .docs-table tr:hover {
+      background: #f8fafc;
+    }
+    
+    /* Alert boxes */
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid;
+    }
+    
+    .alert-info {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      color: #1e40af;
+    }
+    
+    .alert-warning {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+    
+    .alert-success {
+      background: #d1fae5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+  </style>
+</head>
+<body class="font-sans bg-white text-gray-800 overflow-x-hidden">
+  <!-- Progress Bar -->
+  <div id="progress-bar"></div>
+  
+  <!-- Custom Cursor -->
+  <div id="cursor"></div>
+  <div id="cursorblur"></div>
+
+  <!-- Mobile Menu Button -->
+  <button class="mobile-menu-btn" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Navigation -->
+  <div id="nav" class="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md py-4 px-6 flex justify-between items-center shadow-lg">
+      <div class="flex space-x-8">
+        <a href="index.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Home</a>
+        <a href="login.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Login</a>
+        <a href="about.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">About us</a>
+        <a href="signin.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Signup</a>
+        <a href="docs.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Documentation</a>
+        <a href="download.html" class="text-green-400 font-medium">Download</a>
+      </div>
+    </div>
+
+  <!-- Documentation Sidebar -->
+  <div class="docs-sidebar" id="docsSidebar">
+    <div class="mb-8">
+      <h3 class="text-white text-xl font-bold mb-4">Documentation</h3>
+      <div class="nav-item active" data-section="introduction">
+        <i class="fas fa-home"></i> Introduction
+      </div>
+      <div class="nav-item" data-section="architecture">
+        <i class="fas fa-sitemap"></i> System Architecture
+      </div>
+      <div class="nav-item" data-section="implementation">
+        <i class="fas fa-code"></i> Implementation
+      </div>
+      <div class="nav-item" data-section="algorithms">
+        <i class="fas fa-cogs"></i> Algorithms
+      </div>
+      <div class="nav-item" data-section="api">
+        <i class="fas fa-plug"></i> API Reference
+      </div>
+      <div class="nav-item" data-section="testing">
+        <i class="fas fa-vial"></i> Testing
+      </div>
+      <div class="nav-item" data-section="deployment">
+        <i class="fas fa-rocket"></i> Deployment
+      </div>
+    </div>
+    
+    <div>
+      <h3 class="text-white text-xl font-bold mb-4">Additional Resources</h3>
+      <div class="nav-item" data-section="troubleshooting">
+        <i class="fas fa-tools"></i> Troubleshooting
+      </div>
+      <div class="nav-item" data-section="faq">
+        <i class="fas fa-question-circle"></i> FAQ
+      </div>
+      <div class="nav-item" data-section="references">
+        <i class="fas fa-book"></i> References
+      </div>
+    </div>
+  </div>
+
+  <!-- Documentation Content -->
+  <div class="docs-content" id="docsContent">
+    <!-- Introduction Section -->
+    <section id="introduction" class="docs-section active-section">
+      <h1>Hybrid AI-Assisted Page Replacement Documentation</h1>
+      <p class="text-lg text-gray-600 mb-6">Comprehensive guide to understanding and implementing our advanced page replacement algorithm.</p>
+      
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle mr-2"></i>
+        This documentation covers both theoretical concepts and practical implementation details.
+      </div>
+      
+      <h2>Project Overview</h2>
+      <p>The Hybrid AI-Assisted Page Replacement system combines traditional page replacement algorithms with machine learning predictions to optimize memory management in modern operating systems.</p>
+      
+      <h3>Key Features</h3>
+      <ul>
+        <li>AI-powered page access prediction using GRU/LSTM models</li>
+        <li>Dynamic trust scoring for prediction reliability</li>
+        <li>Hybrid approach combining LRU with AI suggestions</li>
+        <li>Real-time validation and model adaptation</li>
+        <li>Performance monitoring and analytics</li>
+      </ul>
+      
+      <h3>System Requirements</h3>
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Minimum</th>
+            <th>Recommended</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CPU</td>
+            <td>Dual-core 2.0 GHz</td>
+            <td>Quad-core 3.0 GHz or higher</td>
+          </tr>
+          <tr>
+            <td>RAM</td>
+            <td>4 GB</td>
+            <td>8 GB or more</td>
+          </tr>
+          <tr>
+            <td>Storage</td>
+            <td>10 GB free space</td>
+            <td>20 GB SSD</td>
+          </tr>
+          <tr>
+            <td>OS</td>
+            <td>Windows 10, Linux 5.4+</td>
+            <td>Windows 11, Linux 5.15+</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="docs-section">
+      <h2>System Architecture</h2>
+      <p>The system follows a modular architecture with clear separation between the AI prediction engine and the traditional page replacement logic.</p>
+      
+      <h3>Core Components</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h4 class="font-bold text-green-600 mb-2">Prediction Engine</h4>
+          <p>Uses GRU/LSTM neural networks to predict future page accesses based on historical patterns.</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h4 class="font-bold text-green-600 mb-2">Trust Manager</h4>
+          <p>Evaluates prediction accuracy and adjusts confidence scores dynamically.</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h4 class="font-bold text-green-600 mb-2">Hybrid Controller</h4>
+          <p>Combines AI predictions with traditional algorithms for optimal performance.</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h4 class="font-bold text-green-600 mb-2">Monitoring System</h4>
+          <p>Tracks performance metrics and provides real-time analytics.</p>
+        </div>
+      </div>
+      
+      <h3>Data Flow</h3>
+      <ol>
+        <li>Page fault occurs in the operating system</li>
+        <li>System initiates I/O operation to fetch required page</li>
+        <li>AI model generates predictions during I/O wait time</li>
+        <li>Trust manager evaluates prediction confidence</li>
+        <li>Hybrid controller makes final page replacement decision</li>
+        <li>System updates model based on actual page accesses</li>
+      </ol>
+      
+      <div class="code-block">
+// Pseudo-code for the main algorithm
+function handlePageFault(requestedPage) {
+  // Start I/O operation
+  startIO(requestedPage);
+  
+  // Generate predictions during I/O wait
+  predictions = aiModel.predict(pageHistory);
+  
+  // Evaluate trust score
+  trustScore = calculateTrustScore(predictions, pageHistory);
+  
+  // Make replacement decision
+  if (trustScore > threshold) {
+    replacePage = selectFromPredictions(predictions);
+  } else {
+    replacePage = lruAlgorithm.selectVictim();
+  }
+  
+  // Perform page replacement
+  performReplacement(replacePage, requestedPage);
+  
+  // Update model with actual access pattern
+  updateModel(requestedPage, predictions);
+}
+      </div>
+    </section>
+
+    <!-- Implementation Section -->
+    <section id="implementation" class="docs-section">
+      <h2>Implementation Details</h2>
+      <p>This section covers the technical implementation of the Hybrid AI-Assisted Page Replacement system.</p>
+      
+      <h3>Model Architecture</h3>
+      <p>The AI prediction model uses a combination of GRU (Gated Recurrent Unit) and LSTM (Long Short-Term Memory) networks to capture both short-term and long-term patterns in page access sequences.</p>
+      
+      <div class="code-block">
+# Python implementation of the prediction model
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import GRU, LSTM, Dense, Dropout
+
+def create_prediction_model(sequence_length, feature_count):
+    model = Sequential([
+        GRU(128, return_sequences=True, input_shape=(sequence_length, feature_count)),
+        Dropout(0.2),
+        LSTM(64, return_sequences=False),
+        Dropout(0.2),
+        Dense(32, activation='relu'),
+        Dense(sequence_length, activation='softmax')  # Predict next pages
+    ])
+    
+    model.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    
+    return model
+      </div>
+      
+      <h3>Integration with OS</h3>
+      <p>The system integrates with the operating system through a kernel module that intercepts page faults and manages the prediction pipeline.</p>
+      
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        Kernel module development requires advanced system programming skills and careful testing.
+      </div>
+      
+      <h3>Configuration Parameters</h3>
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Description</th>
+            <th>Default Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>trust_threshold</td>
+            <td>Minimum confidence for using AI predictions</td>
+            <td>0.75</td>
+          </tr>
+          <tr>
+            <td>prediction_length</td>
+            <td>Number of future pages to predict</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>history_size</td>
+            <td>Number of past accesses to consider</td>
+            <td>50</td>
+          </tr>
+          <tr>
+            <td>model_update_interval</td>
+            <td>How often to retrain the model</td>
+            <td>1000 faults</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Algorithms Section -->
+    <section id="algorithms" class="docs-section">
+      <h2>Algorithms and Methods</h2>
+      <p>Detailed explanation of the algorithms used in the Hybrid AI-Assisted Page Replacement system.</p>
+      
+      <h3>Trust Score Calculation</h3>
+      <p>The trust score combines multiple factors to determine prediction reliability:</p>
+      <ul>
+        <li><strong>Per-page fuzzy confidence (μ)</strong>: Model's confidence for each prediction</li>
+        <li><strong>Short-term accuracy (S)</strong>: Recent prediction success rate</li>
+        <li><strong>Long-term reality weight (W)</strong>: Historical accuracy over time</li>
+      </ul>
+      
+      <div class="code-block">
+// Trust score calculation
+function calculateTrustScore(predictions, history) {
+  let fuzzyConfidence = predictions.reduce((sum, p) => sum + p.confidence, 0) / predictions.length;
+  let shortTermAccuracy = calculateShortTermAccuracy(history);
+  let longTermWeight = getLongTermWeight();
+  
+  return (fuzzyConfidence * 0.4) + (shortTermAccuracy * 0.3) + (longTermWeight * 0.3);
+}
+      </div>
+      
+      <h3>Hybrid Decision Making</h3>
+      <p>The system uses a dynamic threshold to decide when to use AI predictions versus traditional LRU:</p>
+      
+      <div class="code-block">
+// Hybrid decision logic
+function selectReplacementPage(predictions, trustScore, lruCandidate) {
+  const TRUST_THRESHOLD = 0.75;
+  
+  if (trustScore > TRUST_THRESHOLD) {
+    // Use AI prediction
+    return predictions[0].page; // Highest confidence prediction
+  } else {
+    // Fall back to LRU
+    return lruCandidate;
+  }
+}
+      </div>
+      
+      <h3>Model Update Strategy</h3>
+      <p>The AI model is continuously updated based on actual page access patterns:</p>
+      <ol>
+        <li>Track prediction accuracy for each page access</li>
+        <li>Update short-term and long-term accuracy metrics</li>
+        <li>Retrain model periodically with new data</li>
+        <li>Adjust confidence thresholds based on performance</li>
+      </ol>
+    </section>
+
+    <!-- API Section -->
+    <section id="api" class="docs-section">
+      <h2>API Reference</h2>
+      <p>Documentation for the system's programming interfaces.</p>
+      
+      <h3>Kernel Module API</h3>
+      <div class="code-block">
+// Initialize the hybrid page replacement system
+int hybrid_pr_init(void);
+
+// Handle a page fault
+int hybrid_handle_page_fault(struct page_fault_info *fault);
+
+// Update model with actual access pattern
+void hybrid_update_model(page_t accessed_page);
+
+// Get system statistics
+struct hybrid_stats hybrid_get_stats(void);
+
+// Configure system parameters
+int hybrid_configure(struct hybrid_config *config);
+      </div>
+      
+      <h3>User Space API</h3>
+      <div class="code-block">
+// Python API for model management
+class HybridPageReplacement:
+    def __init__(self, model_path=None):
+        self.model = load_model(model_path) if model_path else create_default_model()
+        
+    def predict(self, page_history):
+        """Generate page predictions based on history"""
+        return self.model.predict(page_history)
+        
+    def update(self, actual_page, predicted_pages):
+        """Update model with actual access pattern"""
+        self.model.partial_fit(actual_page, predicted_pages)
+        
+    def get_trust_score(self):
+        """Get current trust score for predictions"""
+        return self.trust_manager.get_score()
+      </div>
+      
+      <h3>Configuration API</h3>
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Function</th>
+            <th>Parameters</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>set_trust_threshold</td>
+            <td>threshold (float)</td>
+            <td>Set minimum confidence for AI predictions</td>
+          </tr>
+          <tr>
+            <td>set_prediction_length</td>
+            <td>length (int)</td>
+            <td>Set number of pages to predict</td>
+          </tr>
+          <tr>
+            <td>enable_performance_logging</td>
+            <td>enable (bool)</td>
+            <td>Enable/disable performance metrics collection</td>
+          </tr>
+          <tr>
+            <td>set_model_update_interval</td>
+            <td>interval (int)</td>
+            <td>Set model retraining frequency</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Testing Section -->
+    <section id="testing" class="docs-section">
+      <h2>Testing and Validation</h2>
+      <p>Comprehensive testing methodology to ensure system reliability and performance.</p>
+      
+      <h3>Test Scenarios</h3>
+      <ul>
+        <li><strong>Unit Tests</strong>: Individual component testing</li>
+        <li><strong>Integration Tests</strong>: Component interaction testing</li>
+        <li><strong>Performance Tests</strong>: System under load testing</li>
+        <li><strong>Comparative Tests</strong>: Against traditional algorithms</li>
+      </ul>
+      
+      <h3>Performance Metrics</h3>
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Description</th>
+            <th>Target Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Page Fault Rate</td>
+            <td>Number of page faults per million instructions</td>
+            <td>&lt; 0.5% improvement over LRU</td>
+          </tr>
+          <tr>
+            <td>Prediction Accuracy</td>
+            <td>Percentage of correct predictions</td>
+            <td>&gt; 85%</td>
+          </tr>
+          <tr>
+            <td>I/O Wait Time</td>
+            <td>Time spent waiting for page loads</td>
+            <td>&gt; 20% reduction</td>
+          </tr>
+          <tr>
+            <td>CPU Overhead</td>
+            <td>Additional CPU usage for AI processing</td>
+            <td>&lt; 5%</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h3>Test Automation</h3>
+      <div class="code-block">
+# Python test script example
+import unittest
+from hybrid_page_replacement import HybridPageReplacement
+
+class TestHybridPR(unittest.TestCase):
+    def setUp(self):
+        self.hybrid_pr = HybridPageReplacement()
+        
+    def test_prediction_accuracy(self):
+        history = [1, 2, 3, 4, 5]
+        predictions = self.hybrid_pr.predict(history)
+        self.assertGreater(len(predictions), 0)
+        
+    def test_trust_score_calculation(self):
+        score = self.hybrid_pr.get_trust_score()
+        self.assertGreaterEqual(score, 0)
+        self.assertLessEqual(score, 1)
+        
+if __name__ == '__main__':
+    unittest.main()
+      </div>
+    </section>
+
+    <!-- Deployment Section -->
+    <section id="deployment" class="docs-section">
+      <h2>Deployment Guide</h2>
+      <p>Step-by-step instructions for deploying the Hybrid AI-Assisted Page Replacement system.</p>
+      
+      <h3>Prerequisites</h3>
+      <ul>
+        <li>Linux kernel 5.4+ or Windows 10/11</li>
+        <li>Python 3.8+ (for model training and management)</li>
+        <li>TensorFlow 2.5+ or PyTorch 1.8+</li>
+        <li>GCC 9.0+ (for kernel module compilation)</li>
+      </ul>
+      
+      <h3>Installation Steps</h3>
+      <ol>
+        <li>Clone the repository</li>
+        <li>Install Python dependencies</li>
+        <li>Compile kernel module</li>
+        <li>Load kernel module</li>
+        <li>Configure system parameters</li>
+        <li>Start monitoring service</li>
+      </ol>
+      
+      <div class="code-block">
+# Installation commands for Linux
+git clone https://github.com/rtu-it/hybrid-page-replacement.git
+cd hybrid-page-replacement
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Compile kernel module
+make -C /lib/modules/$(uname -r)/build M=$PWD modules
+
+# Load module
+sudo insmod hybrid_page_replace.ko
+
+# Configure system
+python configure.py --trust-threshold 0.75 --prediction-length 5
+      </div>
+      
+      <h3>Configuration Files</h3>
+      <p>The system uses JSON configuration files for easy setup:</p>
+      
+      <div class="code-block">
+// config.json
+{
+  "trust_threshold": 0.75,
+  "prediction_length": 5,
+  "history_size": 50,
+  "model_update_interval": 1000,
+  "performance_logging": true,
+  "fallback_algorithm": "lru"
+}
+      </div>
+    </section>
+
+    <!-- Additional sections would continue here -->
+    
+    <!-- Footer -->
+    <div id="footer" class="mt-12 pt-8 border-t border-gray-300">
+      <div class="flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
+        <div id="f1" class="flex justify-center">
+          <img src="feo1.png" alt="Logo" class="h-20">
+        </div>
+        
+        <div id="f2" class="text-center md:text-left">
+          <h3 class="font-bold text-lg mb-2 text-green-600">Team Members</h3>
+          <h3 class="text-gray-600">Naman Sehra</h3>
+          <h3 class="text-gray-600">Shubham Garg</h3>
+          <h3 class="text-gray-600">Hemant</h3>
+        </div>
+        
+        <div id="f3" class="text-center md:text-left">
+          <h3 class="font-bold text-lg mb-2 text-green-600">Connect With Us</h3>
+          <h3 class="text-gray-600 hover:text-green-600 transition-colors cursor-pointer">LinkedIn</h3>
+          <h3 class="text-gray-600 hover:text-green-600 transition-colors cursor-pointer">Twitter</h3>
+          <h3 class="text-gray-600 hover:text-green-600 transition-colors cursor-pointer">Contact us</h3>
+        </div>
+        
+        <div id="f4" class="text-center md:text-left">
+          <h3 class="font-bold text-lg mb-2 text-green-600">Documentation</h3>
+          <h4 class="text-gray-600">
+            Version 1.0<br />
+            Last Updated: 2025<br />
+            RTU IT Department<br />
+          </h4>
+        </div>
+      </div>
+      
+      <div class="mt-8 pt-6 border-t border-gray-300 text-center text-gray-500">
+        <p>&copy; 2025 Hybrid AI-Assisted Page Replacement. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/gsap.min.js" integrity="sha512-qF6akR/fsZAB4Co1QDDnUXWnaQseLGXoniuSuSlPQK6+aWhlMZcHzkasCSlnWoe+TJuudlka1/IQ01Dnhgq95g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/ScrollTrigger.min.js" integrity="sha512-IHDCHrefnBT3vOCsvdkMvJF/MCPz/nBauQLzJkupa4Gn4tYg5a6VGyzIrjo6QAUy3We5HFOZUlkUpP0dkgE60A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+  <script>
+    // Cursor movement
+    document.addEventListener("mousemove", function(dets) {
+      const cursor = document.getElementById("cursor");
+      const cursorBlur = document.getElementById("cursorblur");
+      
+      cursor.style.left = dets.x + "px";
+      cursor.style.top = dets.y + "px";
+      
+      cursorBlur.style.left = dets.x - 125 + "px";
+      cursorBlur.style.top = dets.y - 125 + "px";
+    });
+    
+    // Hover effect on links
+    const links = document.querySelectorAll("a, button, .nav-item");
+    links.forEach(link => {
+      link.addEventListener("mouseenter", () => {
+        document.getElementById("cursor").style.transform = "scale(1.5)";
+        document.getElementById("cursor").style.backgroundColor = "#95c11e";
+      });
+      link.addEventListener("mouseleave", () => {
+        document.getElementById("cursor").style.transform = "scale(1)";
+        document.getElementById("cursor").style.backgroundColor = "rgb(235, 232, 232)";
+      });
+    });
+    
+    // Progress bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progress-bar').style.width = scrolled + '%';
+    });
+    
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      document.getElementById('docsSidebar').classList.toggle('active');
+    });
+    
+    // Navigation between sections
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        // Remove active class from all items
+        document.querySelectorAll('.nav-item').forEach(i => {
+          i.classList.remove('active');
+        });
+        
+        // Add active class to clicked item
+        this.classList.add('active');
+        
+        // Hide all sections
+        document.querySelectorAll('.docs-section').forEach(section => {
+          section.classList.remove('active-section');
+        });
+        
+        // Show selected section
+        const sectionId = this.getAttribute('data-section');
+        document.getElementById(sectionId).classList.add('active-section');
+        
+        // Close mobile menu if open
+        if (window.innerWidth <= 1024) {
+          document.getElementById('docsSidebar').classList.remove('active');
+        }
+      });
+    });
+    
+    // Scroll-triggered animations
+    function checkVisibility() {
+      const elements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in');
+      
+      elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.classList.add('visible');
+        }
+      });
+    }
+    
+    // Event listeners
+    window.addEventListener('scroll', checkVisibility);
+    window.addEventListener('load', function() {
+      checkVisibility();
+    });
+    
+    // GSAP animations
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Animate elements on scroll with GSAP
+    gsap.utils.toArray('.docs-section').forEach(section => {
+      gsap.fromTo(section, 
+        { y: 50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          scrollTrigger: {
+            trigger: section,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    });
+  </script>
+</body>
+</html>

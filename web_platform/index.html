@@ -1,238 +1,923 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.css">
-  <title>Document</title>
-</head>
+  <title>Hybrid AI-Assisted Page Replacement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    /* Custom styles for cursor and animations */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
-<body>
-  <div id="cursor">
-
-      </div>
-      <div id="cursorblur">
-
-      </div>
-
-  <div id="main">
+    html, body {
+      height: 100%;
+      width: 100%;
+      scroll-behavior: smooth;
+    }
     
-    <div id="page">
-      <div id="nav">
-          <div id="login">
-            <a href="login.html">
-              <h1>Login</h1>
-            </a>
+    #cursor {
+      height: 25px;
+      width: 25px;
+      background-color: rgb(235, 232, 232);
+      border-radius: 50%;
+      z-index: 99;
+      position: fixed;
+      transition: all 0.1s ease-out;
+      pointer-events: none;
+    }
+    
+    #cursorblur {
+      height: 250px;
+      width: 250px;
+      background-color: rgba(233, 228, 228, 0.3);
+      border-radius: 50%;
+      z-index: 99;
+      position: fixed;
+      filter: blur(50px);
+      transition: all 0.4s ease-out;
+      pointer-events: none;
+    }
+    
+    #main {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #page {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      background-color: #efecec;
+      background-image: url("photosrepo/images (1).jpeg.png");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    
+    .part {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+    }
+    
+    /* Animations for each part - Modified for repeat */
+    .part1 {
+      animation: dropIn 1s ease forwards;
+    }
+    
+    .part2 {
+      animation: slideInLeft 1s ease forwards 0.3s;
+    }
+    
+    .part3 {
+      animation: slideInRight 1s ease forwards 0.6s;
+    }
+    
+    .part4 {
+      animation: riseUp 1s ease forwards 0.9s;
+    }
+    
+    .part5 {
+      animation: dropIn 1s ease forwards 1.2s;
+    }
+    
+    .part6 {
+      animation: slideInLeft 1s ease forwards 1.5s;
+    }
+    
+    .part7 {
+      animation: slideInRight 1s ease forwards 1.8s;
+    }
+    
+    .part8 {
+      animation: riseUp 1s ease forwards 2.1s;
+    }
+    
+    .part9 {
+      animation: riseUp 0ms ease forwards 2.1s;
+    }
+    
+    /* Keyframes */
+    @keyframes dropIn {
+      from {
+        transform: translateY(-300px) scale(0.5);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        transform: translateX(-400px) rotate(-45deg);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0) rotate(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideInRight {
+      from {
+        transform: translateX(400px) rotate(45deg);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0) rotate(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes riseUp {
+      from {
+        transform: translateY(300px) scale(0.5);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Scroll-triggered animations - Modified for repeat */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+    
+    .fade-in.animate-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .slide-in-left {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.8s ease;
+    }
+    
+    .slide-in-left.animate-visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .slide-in-right {
+      opacity: 0;
+      transform: translateX(50px);
+      transition: all 0.8s ease;
+    }
+    
+    .slide-in-right.animate-visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .scale-in {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.8s ease;
+    }
+    
+    .scale-in.animate-visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    /* Progress bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 4px;
+      background: linear-gradient(90deg, #95c11e, #2f332e);
+      z-index: 100;
+      transition: width 0.1s ease;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #95c11e;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #7ea818;
+    }
+    
+    /* Text stroke effect */
+    .text-stroke {
+      -webkit-text-stroke: 2px #b6e92a;
+      color: transparent;
+    }
+    
+    /* Scrolling text animation */
+    @keyframes scroll {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-100%);
+      }
+    }
+    
+    .scrolling-text {
+      animation: scroll 20s linear infinite;
+    }
+    
+    /* Parallax effect */
+    .parallax {
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    /* New animation classes for repeating animations */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+    
+    .animate-on-scroll.animated {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .slide-left-on-scroll {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.8s ease;
+    }
+    
+    .slide-left-on-scroll.animated {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .slide-right-on-scroll {
+      opacity: 0;
+      transform: translateX(50px);
+      transition: all 0.8s ease;
+    }
+    
+    .slide-right-on-scroll.animated {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .scale-on-scroll {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.8s ease;
+    }
+    
+    .scale-on-scroll.animated {
+      opacity: 1;
+      transform: scale(1);
+    }
+  </style>
+</head>
+<body class="font-sans bg-white text-gray-800 overflow-x-hidden">
+  <!-- Progress Bar -->
+  <div id="progress-bar"></div>
+  
+  <!-- Custom Cursor -->
+  <div id="cursor"></div>
+  <div id="cursorblur"></div>
+
+  <div id="main" data-scroll-container>
+    <!-- Navigation -->
+    <div id="nav" class="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md py-4 px-6 flex justify-between items-center shadow-lg">
+      <div class="flex space-x-8">
+        <a href="index.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Home</a>
+        <a href="login.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Login</a>
+        <a href="about.html" class="text-green-400 font-medium">About us</a>
+        <a href="signin.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Signup</a>
+        <a href="docs.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Documentation</a>
+        <a href="download.html" class="text-white hover:text-green-400 transition-all duration-300 font-medium transform hover:scale-105">Download</a>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div id="page" class="min-h-screen flex flex-col justify-center items-center pt-16 px-4 relative">
+      <div class="absolute inset-0 bg-black/50"></div>
+      
+      <div id="middle" class="w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10">
+        <div id="right" class="w-full md:w-1/2 flex flex-col items-center">
+          <div class="logo mb-8 grid grid-cols-3 gap-2 w-64 h-64 relative">
+            <img src="photosrepo/1Forhead.png" class="part part1 rounded-lg">
+            <img src="photosrepo/2Right.png" class="part part2 rounded-lg">
+            <img src="photosrepo/3Left.png" class="part part3 rounded-lg">
+            <img src="photosrepo/4Middle.png" class="part part4 rounded-lg">
+            <img src="photosrepo/5LLeft.png" class="part part5 rounded-lg">
+            <img src="photosrepo/6LRight.png" class="part part6 rounded-lg">
+            <img src="photosrepo/7LMiddle.png" class="part part7 rounded-lg">
+            <img src="photosrepo/8Lower.png" class="part part8 rounded-lg">
+            <img src="photosrepo/shape_part1.png" class="part part9 rounded-lg">
           </div>
-          <div id="about">
-            <a href="/about.html">
-              <h1>About us</h1>
-            </a>
-          </div>
-          <div id="email">
-            <a href="">
-              <h1>Home</h1>
-            </a>
-          </div>
-          <div id="contact">
-            <a href="/signin.html">
-              <h1>Signup</h1>
-            </a>
+          <button class="getstart bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg mt-8">
+            Get Started
+          </button>
+        </div>
+        
+        <div id="pagem" class="w-full md:w-1/2 mt-10 md:mt-0 md:pl-12 text-center md:text-left">
+          <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight animate-on-scroll">
+            Hybrid AI-Assisted Page Replacement
+          </h1>
+          <h2 class="text-2xl md:text-3xl font-semibold text-green-400 mb-4 animate-on-scroll">
+            WELCOME TO RTU IT!
+          </h2>
+          <p class="text-lg text-gray-200 animate-on-scroll">
+            RTU Family has versatile talent in cutting-edge technology solutions.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Scroll Indicator -->
+      <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-on-scroll">
+        <div class="flex flex-col items-center">
+          <span class="mb-2">Scroll Down</span>
+          <div class="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+            <div class="w-1 h-3 bg-white rounded-full mt-2 animate-bounce"></div>
           </div>
         </div>
-        <div id="middle">
-        <div id="right">
-          <div class="logo">
-            <img src="1Forhead.png" class="part part1">
-            <img src="2Right.png" class="part part2">
-            <img src="3Left.png" class="part part3">
-            <img src="4Middle.png" class="part part4">
-            <img src="5LLeft.png" class="part part5">
-            <img src="6LRight.png" class="part part6">
-            <img src="7LMiddle.png" class="part part7">
-            <img src="8Lower.png" class="part part8">
-             <img src="feo1.png" class="part part9">
+      </div>
+    </div>
 
+    <!-- Scrolling Text Banner -->
+    <div class="bg-black py-4 overflow-hidden">
+      <div class="scrolling-text flex whitespace-nowrap">
+        <h4 class="text-6xl font-bold text-stroke mx-8">HYBRID AI PAGE REPLACEMENT</h4>
+        <h4 class="text-6xl font-bold text-stroke mx-8">RTU IT DEPARTMENT</h4>
+        <h4 class="text-6xl font-bold text-stroke mx-8">ADVANCED OS ALGORITHMS</h4>
+        <h4 class="text-6xl font-bold text-stroke mx-8">MACHINE LEARNING INTEGRATION</h4>
+      </div>
+    </div>
 
-
+    <!-- About Us Section -->
+    <div id="about-us" class="py-20 px-4 bg-gray-900 text-white">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+             class="w-full md:w-1/4 rounded-xl shadow-lg slide-left-on-scroll" 
+             alt="AI Technology">
+        
+        <div id="about-us-in" class="w-full md:w-2/4 animate-on-scroll">
+          <h3 class="text-3xl font-bold text-white mb-6 text-center md:text-left">About Our Technology</h3>
+          <p class="text-gray-300 leading-relaxed">
+            When the OS experiences a page fault, it uses the I/O wait time to ask an AI predictor (GRU/LSTM) to produce a short, ordered multi-step prediction chain. The OS keeps running LRU as the fast critical path; the AI acts as an advisor whose suggestions are accepted only when a dynamic trust score (fusing per-page fuzzy μ, short term S, and long-term reality W) is high. Predictions are validated step-by-step and the system updates page-level and global trust using rewards/penalties.
+          </p>
+          <div class="mt-6 grid grid-cols-2 gap-4">
+            <div class="bg-gray-800 p-4 rounded-lg">
+              <h4 class="font-bold text-green-400">AI Prediction</h4>
+              <p class="text-sm">Uses GRU/LSTM models for accurate page prediction</p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg">
+              <h4 class="font-bold text-green-400">Dynamic Trust</h4>
+              <p class="text-sm">Adaptive scoring system for prediction reliability</p>
+            </div>
           </div>
-          <div class="getstart">
-            Get Start
+        </div>
+        
+        <img src="https://images.unsplash.com/photo-1555255707-c07966088b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+             class="w-full md:w-1/4 rounded-xl shadow-lg slide-right-on-scroll" 
+             alt="System Architecture">
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="py-16 bg-gradient-to-r from-green-900 to-gray-900 text-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12 animate-on-scroll">Performance Metrics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="text-center scale-on-scroll">
+            <div class="text-5xl font-bold text-green-400 mb-2 stat-counter" data-target="95">0</div>
+            <div class="text-gray-300">Page Fault Reduction</div>
+          </div>
+          <div class="text-center scale-on-scroll">
+            <div class="text-5xl font-bold text-green-400 mb-2 stat-counter" data-target="87">0</div>
+            <div class="text-gray-300">Prediction Accuracy</div>
+          </div>
+          <div class="text-center scale-on-scroll">
+            <div class="text-5xl font-bold text-green-400 mb-2 stat-counter" data-target="42">0</div>
+            <div class="text-gray-300">I/O Wait Time Decrease</div>
+          </div>
+          <div class="text-center scale-on-scroll">
+            <div class="text-5xl font-bold text-green-400 mb-2 stat-counter" data-target="63">0</div>
+            <div class="text-gray-300">System Performance Boost</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards Section -->
+    <div id="cards-container" class="py-20 px-4 bg-gray-100">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12 animate-on-scroll">How It Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="card bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-xl scale-on-scroll">
+            <div class="p-6 bg-gradient-to-br from-green-50 to-blue-50 h-full">
+              <div class="text-green-600 text-4xl font-bold mb-4">01</div>
+              <h4 class="text-xl font-bold text-gray-800 mb-4">Model Activation Policy</h4>
+              <p class="text-gray-600">
+                Model runs only on page fault: when OS experiences a page fault and starts disk/SSD I/O, model uses that I/O wait time to generate a full prediction chain (one-shot multi-step). This avoids running the model on the critical path.
+                <br><br>
+                Chain length is adaptive:
+                <br>
+                chain_len = min(max_chain, floor(IO_time / model_time_per_prediction))
+              </p>
+            </div>
           </div>
           
+          <div class="card bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-xl scale-on-scroll">
+            <div class="p-6 bg-gradient-to-br from-blue-50 to-purple-50 h-full">
+              <div class="text-blue-600 text-4xl font-bold mb-4">02</div>
+              <h4 class="text-xl font-bold text-gray-800 mb-4">Model Outputs</h4>
+              <p class="text-gray-600">
+                Ordered predicted pages: p = [p1, p2, p3, ...] (head is immediate next).
+                <br><br>
+                Per-step confidences conf = [c1, c2, ...] (sigmoid outputs — fuzzy confidences).
+                <br><br>
+                Optionally: model also outputs cp (immediate next) and long chain, and can produce per-prediction μ proposals.
+                Model inputs: history, mu values for pages in history, and W (global reality weight) and S optionally.
+              </p>
+            </div>
+          </div>
+          
+          <div class="card bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-xl scale-on-scroll">
+            <div class="p-6 bg-gradient-to-br from-purple-50 to-pink-50 h-full">
+              <div class="text-purple-600 text-4xl font-bold mb-4">03</div>
+              <h4 class="text-xl font-bold text-gray-800 mb-4">Continuous Chain Usage</h4>
+              <p class="text-gray-600">
+                For every incoming page access (normal CPU access), follow:
+                <br><br>
+                1. If q (active chain) exists → compare actual page c with q[0] (head).
+                o If c == q[0] → Match: reward model, advance q (pop head). Update mu[c] and S. No LRU involvement.
+                o If c != q[0] but page is in memory (no page fault) → Mismatch without fault: do NOT discard the chain.
+                <br><br>
+                2. If a true page fault occurs (page not in memory) → follow Page Fault Handling.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-         
+    <!-- Dynamic Content Section -->
+    <div class="py-20 bg-black text-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll">Dynamic Content Loading</h2>
+        <p class="text-center text-gray-400 mb-12 max-w-2xl mx-auto animate-on-scroll">
+          As you scroll, new content is dynamically loaded and animated into view
+        </p>
         
+        <div id="dynamic-content" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Content will be loaded dynamically via JavaScript -->
         </div>
         
-      </div> 
-        
+        <div class="text-center mt-12">
+          <button id="load-more" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+            Load More Features
+          </button>
+        </div>
       </div>
-      <div id="pagem">
-             
-                  <h1>Hybrid AI-Assisted Page Replacement </h1>
-
-                  <H2>WELCOME TO RTU IT !</H2>
-                  <P>RTU Family   has a VErsatile talent in </P>
-
-            </div>
-      
-<!--   
-      <div id="page1">
-            
-        
-             <video src="Recording 2025-09-24 085813.mp4" muted ></video>
-             
-        </div> -->
-        <!-- <div id="page2">
-            <h1>Apple Vision Pro seamlessly blends <br> digital content with your physical space.</h1>
-            <video src="Recording 2025-09-24 085813.mp4" autoplay loop muted ></video> 
-        </div> -->
-        
-
-        
-        <div id="about-us">
-                        <img src="WhatsApp Image 2025-10-13 at 22.04.24_96f688de.jpg"/>
-                        <div id="about-us-in">
-                              <h3>About Us</h3>
-                              <p>When the OS experiences a page fault, it uses the I/O wait time to ask an AI predictor (GRU/LSTM) to produce a short, ordered multi-step prediction chain. The OS keeps running LRU as the fast critical path; the AI acts as an advisor whose suggestions are accepted only when a dynamic trust score (fusing per-page fuzzy μ, short term S, and long-term reality W) is high. Predictions are validated step-by-step and the system updates page-level and global trust using rewards/penalties.
-                              </p>
-                        </div>
-                        <img src="WhatsApp Image 2025-10-13 at 22.08.39_24fdb4b8.jpg"/>
-                  </div>
-                  <div id="cards-container">
-                        <div class="card" id="card1">
-                              <div class="overlay">
-                                    <h4> 4) When the model runs (activation policy)</h4>
-                                    <p>
-                                        
-
-Model runs only on page fault: when OS experiences a page fault and starts disk/SSD I/O, model uses that I/O wait time to generate a full prediction chain (one-shot multi-step). This avoids running the model on the critical path.
-
-Chain length is adaptive:
-
-chain_len = min(max_chain, floor(IO_time / model_time_per_prediction))
-Example: if IO_time = 100 μs, model_time_per_pred ≈ 5 μs → chain_len ≈ 20.
-                                    </p>
-                              </div>
-                        </div>
-                        <div class="card" id="card2">
-                              <div class="overlay">
-                                    <h4>2) What the model outputs</h4>
-                                    <p>
-                                         
-
-Ordered predicted pages: p = [p1, p2, p3, ...] (head is immediate next).
-
-Per-step confidences conf = [c1, c2, ...] (sigmoid outputs — fuzzy confidences).
-
-Optionally: model also outputs cp (immediate next) and long chain, and can produce per-prediction μ proposals.
-Model inputs: history, mu values for pages in history, and W (global reality weight) and S optionally.
-Implementation note: prefer GRU for faster inference with close accuracy; do multi-head output in one forward pass.
-                                    </p>
-                              </div>
-                        </div>
-                        <div class="card" id="card3">
-                              <div class="overlay">
-                                    <h4>6) Continuous chain usage & per-access behavior</h4>
-                                    <p>
-
-For every incoming page access (normal CPU access), follow:
-1. If q (active chain) exists → compare actual page c with q[0] (head).
-o If c == q[0] → Match: reward model, advance q (pop head). Update mu[c] and S. No LRU involvement.
-o If c != q[0] but page is in memory (no page fault) → Mismatch without fault: do NOT discard the chain; soft-penalize model trust W (or S) and continue (advance/adjust queues as described below).
-2. If a true page fault occurs (page not in memory) → follow Page Fault Handling (next section).
-This keeps the chain “alive” across soft mismatches; only a true page fault causes regeneration.?
-                                    </p>
-                              </div>
-                        </div>
-                  </div>
-                  <div id="green-div">
-                        <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-side.svg"
-                              alt="" />
-
-                        <h4>SIGN UP to use awesome feature of operating system</h4>
-                        <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-side.svg"
-                              alt="" />
-
-                  </div>
-
-            
-            <div id="page3">
-                  <h4>EXCELLENT COUPLE OF HOURS,RELAX AND ENJOY INTHE FUN.SYUFF WERE ACCOMMODATING,REIENDLY AND VERY
-                        HELPFUL.CAFE ON SITE FOR REPRESENTATION ETC. aoperating iperfnfjelfkepfokf;elfk</h4>
-                  <img id="colon1"
-                        src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/quote-left.svg" alt="" />
-                  <img id="colon2"
-                        src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/quote-right.svg"
-                        alt="" />
-
-            </div>
-        <div id="page4">
-                  <h1>what are you waiting for</h1>
-                  <div id="elem">
-                        <h2>HIBRID</h2>
-                        <img src="WhatsApp Image 2025-10-13 at 22.04.22_30905d67.jpg"
-                              alt="" />
-
-
-                  </div>
-                  <div id="elem">
-                        <h2>PAGE</h2>
-                        <img src="WhatsApp Image 2025-10-13 at 22.04.24_96f688de.jpg"
-                              alt="" />
-
-
-
-                  </div>
-                  <div id="elem">
-                        <h2>Replacement</h2>
-                        <img src="WhatsApp Image 2025-10-13 at 22.08.39_24fdb4b8.jpg"/>
-
-                  </div>
-            </div>
-            <div id="footer">
-                  <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-footer.svg" alt="" />
-                  <div id="f1">
-                        <img src="feo1.png" alt="" />
-                  </div>
-                  <div id="f2">
-                        <h3>Naman Sehra</h3>
-                        <h3>Shuibham Garg</h3>
-                        <h3>Hemant </h3>
-                  </div>
-                  <div id="f3">
-                        <h3>LinkedIn</h3>
-                        <h3>Twitter</h3>
-                        <h3>Contact us</h3>
-                  </div>
-                  <div id="f4">
-                        <h4>
-                              H1,shubham garg <br />
-                              =Bhadana shadan <br />
-                              KT h5<br />
-                              tank house <br />
-                              TEL: 0208 309 0181 <br />
-                              GET DIRECTIONS <br />
-                        </h4>
-                  </div>
-            </div>
-
-
-
-
-
-
-
-
-
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/gsap.min.js" integrity="sha512-qF6akR/fsZAB4Co1QDDnUXWnaQseLGXoniuSuSlPQK6+aWhlMZcHzkasCSlnWoe+TJuudlka1/IQ01Dnhgq95g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/ScrollTrigger.min.js" integrity="sha512-IHDCHrefnBT3vOCsvdkMvJF/MCPz/nBauQLzJkupa4Gn4tYg5a6VGyzIrjo6QAUy3We5HFOZUlkUpP0dkgE60A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="sf.js"></script>
-</body>
 
-</html> 
+    <!-- Sign Up Banner -->
+   <div id="green-div" class="py-12 bg-green-800 text-white">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-10 px-4">
+    <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-side.svg" alt="" class="hidden md:block h-96 w-auto">
+    <h4 class="text-2xl md:text-3xl font-bold text-center flex-1 px-6 leading-tight animate-on-scroll">
+      SIGN UP to use awesome features of our operating system
+    </h4>
+    <img src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/dots-side.svg" alt="" class="hidden md:block h-96 w-auto ">
+  </div>
+  <div class="text-center mt-6">
+    <button class="bg-white text-green-800 hover:bg-green-100 font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+      Sign Up Now
+    </button>
+  </div>
+</div>
+
+    <!-- Testimonial Section -->
+    <div id="page3" class="py-20 px-4 bg-gray-900 text-white relative parallax" style="background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');">
+      <div class="absolute inset-0 bg-black/70"></div>
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <h4 class="text-xl md:text-2xl text-white italic leading-relaxed animate-on-scroll">
+          EXCELLENT COUPLE OF HOURS, RELAX AND ENJOY IN THE FUN. STAFF WERE ACCOMMODATING, FRIENDLY AND VERY HELPFUL. CAFE ON SITE FOR REFRESHMENTS ETC. A PERFECT BLEND OF TECHNOLOGY AND USER EXPERIENCE.
+        </h4>
+        <div class="flex justify-between mt-8">
+          <img id="colon1" src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/quote-left.svg" alt="" class="w-12 h-12 slide-left-on-scroll">
+          <img id="colon2" src="https://eiwgew27fhz.exactdn.com/wp-content/themes/puttosaurus/img/quote-right.svg" alt="" class="w-12 h-12 slide-right-on-scroll">
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="page4" class="py-20 px-4 bg-black text-white">
+      <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-center text-white mb-12 animate-on-scroll">What are you waiting for?</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="elem bg-gray-800 rounded-xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 group relative scale-on-scroll">
+            <div class="p-6 text-center h-64 flex flex-col justify-center">
+              <h2 class="text-2xl font-bold text-white mb-4 group-hover:text-green-400 transition-colors">HYBRID</h2>
+              <p class="text-gray-400">Combining AI prediction with traditional algorithms</p>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
+              <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-full transition-colors">
+                Learn More
+              </button>
+            </div>
+          </div>
+          
+          <div class="elem bg-gray-800 rounded-xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 group relative scale-on-scroll">
+            <div class="p-6 text-center h-64 flex flex-col justify-center">
+              <h2 class="text-2xl font-bold text-white mb-4 group-hover:text-green-400 transition-colors">PAGE</h2>
+              <p class="text-gray-400">Intelligent memory management for modern systems</p>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
+              <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-full transition-colors">
+                Learn More
+              </button>
+            </div>
+          </div>
+          
+          <div class="elem bg-gray-800 rounded-xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 group relative scale-on-scroll">
+            <div class="p-6 text-center h-64 flex flex-col justify-center">
+              <h2 class="text-2xl font-bold text-white mb-4 group-hover:text-green-400 transition-colors">REPLACEMENT</h2>
+              <p class="text-gray-400">Advanced algorithms for optimal performance</p>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
+              <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-full transition-colors">
+                Learn More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer" class="py-12 bg-gray-900 text-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
+          <div id="f1" class="flex justify-center">
+            <img src="feo1.png" alt="Logo" class="h-20">
+          </div>
+          
+          <div id="f2" class="text-center md:text-left">
+            <h3 class="font-bold text-lg mb-2 text-green-400">Team Members</h3>
+            <h3 class="text-gray-300">Naman Sehra</h3>
+            <h3 class="text-gray-300">Shubham Garg</h3>
+            <h3 class="text-gray-300">Hemant</h3>
+          </div>
+          
+          <div id="f3" class="text-center md:text-left">
+            <h3 class="font-bold text-lg mb-2 text-green-400">Connect With Us</h3>
+            <h3 class="text-gray-300 hover:text-green-400 transition-colors cursor-pointer">LinkedIn</h3>
+            <h3 class="text-gray-300 hover:text-green-400 transition-colors cursor-pointer">Twitter</h3>
+            <h3 class="text-gray-300 hover:text-green-400 transition-colors cursor-pointer">Contact us</h3>
+          </div>
+          
+          <div id="f4" class="text-center md:text-left">
+            <h3 class="font-bold text-lg mb-2 text-green-400">Location</h3>
+            <h4 class="text-gray-300">
+              H1, Shubham Garg <br />
+              Bhadana Shadan <br />
+              KT H5<br />
+              Tank House <br />
+              TEL: 0208 309 0181 <br />
+              GET DIRECTIONS <br />
+            </h4>
+          </div>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-gray-700 text-center text-gray-400">
+          <p>&copy; 2025 Hybrid AI-Assisted Page Replacement. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/gsap.min.js" integrity="sha512-qF6akR/fsZAB4Co1QDDnUXWnaQseLGXoniuSuSlPQK6+aWhlMZcHzkasCSlnWoe+TJuudlka1/IQ01Dnhgq95g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.1/ScrollTrigger.min.js" integrity="sha512-IHDCHrefnBT3vOCsvdkMvJF/MCPz/nBauQLzJkupa4Gn4tYg5a6VGyzIrjo6QAUy3We5HFOZUlkUpP0dkgE60A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+ <script>
+    // Cursor movement
+    document.addEventListener("mousemove", function(dets) {
+      const cursor = document.getElementById("cursor");
+      const cursorBlur = document.getElementById("cursorblur");
+      
+      cursor.style.left = dets.x + "px";
+      cursor.style.top = dets.y + "px";
+      
+      cursorBlur.style.left = dets.x - 125 + "px";
+      cursorBlur.style.top = dets.y - 125 + "px";
+    });
+    
+    // Hover effect on links
+    const links = document.querySelectorAll("a, button");
+    links.forEach(link => {
+      link.addEventListener("mouseenter", () => {
+        document.getElementById("cursor").style.transform = "scale(1.5)";
+        document.getElementById("cursor").style.backgroundColor = "#95c11e";
+      });
+      link.addEventListener("mouseleave", () => {
+        document.getElementById("cursor").style.transform = "scale(1)";
+        document.getElementById("cursor").style.backgroundColor = "rgb(235, 232, 232)";
+      });
+    });
+    
+    /* // Initialize Locomotive Scroll
+    const scroll = new LocomotiveScroll({
+      el: document.querySelector('[data-scroll-container]'),
+      smooth: true
+    }); */
+    
+    // Progress bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progress-bar').style.width = scrolled + '%';
+    });
+    
+    // NEW: Scroll-triggered animations that repeat every time
+    function checkVisibility() {
+      const elements = document.querySelectorAll('.animate-on-scroll, .slide-left-on-scroll, .slide-right-on-scroll, .scale-on-scroll');
+      
+      elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.classList.add('animated');
+        } else {
+          // Remove the class when element goes out of view
+          element.classList.remove('animated');
+        }
+      });
+    }
+    
+    // Counter animation for stats
+    function animateCounters() {
+      const counters = document.querySelectorAll('.stat-counter');
+      const speed = 20;
+      counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        const count = +counter.innerText;
+        const increment = target / speed;
+        
+        if (count < target) {
+          counter.innerText = Math.ceil(count + increment);
+          setTimeout(() => animateCounters(), 1);
+        } else {
+          counter.innerText = target;
+        }
+      });
+    }
+    
+    // Dynamic content loading
+    const dynamicContent = [
+      {
+        title: "AI Prediction Models",
+        description: "Our system utilizes advanced GRU and LSTM models to predict page access patterns with high accuracy.",
+        icon: "🧠"
+      },
+      {
+        title: "Dynamic Trust Scoring",
+        description: "A sophisticated scoring system that evaluates prediction reliability and adapts in real-time.",
+        icon: "📊"
+      },
+      {
+        title: "Hybrid Algorithm",
+        description: "Combines traditional LRU with AI predictions for optimal performance in all scenarios.",
+        icon: "⚡"
+      },
+      {
+        title: "Real-time Validation",
+        description: "Continuous validation of predictions with immediate feedback to improve accuracy.",
+        icon: "✅"
+      },
+      {
+        title: "Adaptive Learning",
+        description: "The system continuously learns from user behavior to improve prediction accuracy over time.",
+        icon: "🎯"
+      },
+      {
+        title: "Performance Analytics",
+        description: "Comprehensive monitoring and analytics to track system performance and optimization.",
+        icon: "📈"
+      }
+    ];
+    
+    let loadedContent = 0;
+    let contentLoadTriggered = false;
+    
+    function loadDynamicContent() {
+      const container = document.getElementById('dynamic-content');
+      
+      if (loadedContent < dynamicContent.length) {
+        const content = dynamicContent[loadedContent];
+        const contentElement = document.createElement('div');
+        contentElement.className = 'bg-gray-800 p-6 rounded-lg animate-on-scroll';
+        contentElement.innerHTML = `
+          <div class="text-4xl mb-4">${content.icon}</div>
+          <h3 class="text-xl font-bold text-white mb-2">${content.title}</h3>
+          <p class="text-gray-400">${content.description}</p>
+        `;
+        container.appendChild(contentElement);
+        loadedContent++;
+        
+        // Trigger animation after a short delay
+        setTimeout(() => {
+          checkVisibility();
+        }, 100);
+      }
+      
+      // Hide button if all content is loaded
+      if (loadedContent >= dynamicContent.length) {
+        document.getElementById('load-more').style.display = 'none';
+      }
+    }
+    
+    // Load initial content on page load
+    function loadInitialContent() {
+      // Load first 2 items immediately
+      loadDynamicContent();
+      loadDynamicContent();
+    }
+    
+    // Scroll-triggered content loading
+    function setupScrollTriggeredLoading() {
+      const dynamicSection = document.querySelector('.py-20.bg-black');
+      const loadMoreBtn = document.getElementById('load-more');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !contentLoadTriggered) {
+            contentLoadTriggered = true;
+            
+            // Load content with delays for better UX
+            setTimeout(() => loadDynamicContent(), 300);
+            setTimeout(() => loadDynamicContent(), 600);
+            setTimeout(() => loadDynamicContent(), 900);
+            setTimeout(() => loadDynamicContent(), 1200);
+          }
+        });
+      }, {
+        threshold: 0.3,
+        rootMargin: '0px 0px -100px 0px'
+      });
+      
+      if (dynamicSection) {
+        observer.observe(dynamicSection);
+      }
+    }
+    
+    // Button click handler
+    document.getElementById('load-more').addEventListener('click', function() {
+      // Load remaining content when button is clicked
+      while (loadedContent < dynamicContent.length) {
+        loadDynamicContent();
+      }
+    });
+    
+    // NEW: Reset animations when scrolling up
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Check if scrolling up
+      if (scrollTop < lastScrollTop) {
+        // Reset animations for elements that are now in view
+        checkVisibility();
+      }
+      
+      lastScrollTop = scrollTop;
+    }, false);
+    
+    // Event listeners
+    window.addEventListener('scroll', checkVisibility);
+    window.addEventListener('load', function() {
+      checkVisibility();
+      loadInitialContent();
+      setupScrollTriggeredLoading();
+      
+      // Trigger counter animation when stats section is in view
+      const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCounters();
+            statsObserver.unobserve(entry.target);
+          }
+        });
+      });
+      
+      const statsSection = document.querySelector('.scale-on-scroll');
+      if (statsSection) {
+        statsObserver.observe(statsSection);
+      }
+    });
+    
+    // GSAP animations - Modified to work with our new system
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Animate elements on scroll with GSAP - Updated for repeat
+    gsap.utils.toArray('.card, .elem').forEach(element => {
+      gsap.fromTo(element, 
+        { y: 50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          scrollTrigger: {
+            trigger: element,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play reverse play reverse" // This makes it repeat
+          }
+        }
+      );
+    });
+
+    // Enhanced scroll-triggered animations for dynamic content
+    gsap.utils.toArray('#dynamic-content > div').forEach(element => {
+      gsap.fromTo(element,
+        { y: 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          scrollTrigger: {
+            trigger: element,
+            start: "top 85%",
+            end: "bottom 20%",
+            toggleActions: "play reverse play reverse" // This makes it repeat
+          }
+        }
+      );
+    });
+
+    // NEW: Repeating animation for the logo parts
+    function resetLogoAnimation() {
+      const parts = document.querySelectorAll('.part');
+      parts.forEach(part => {
+        // Remove animation classes
+        part.style.animation = 'none';
+        
+        // Trigger reflow
+        void part.offsetWidth;
+        
+        // Re-add animation classes
+        const partClass = Array.from(part.classList).find(cls => cls.startsWith('part'));
+        if (partClass) {
+          part.style.animation = '';
+        }
+      });
+    }
+
+    // Observe when hero section comes into view
+    const heroSection = document.getElementById('page');
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          resetLogoAnimation();
+        }
+      });
+    }, {
+      threshold: 0.5
+    });
+
+    if (heroSection) {
+      heroObserver.observe(heroSection);
+    }
+</script>
+</body>
+</html>

@@ -1,4 +1,0 @@
-=== Collection Summary ===
-Total samples collected: 300
-End time: Tue Oct  7 14:57:52 UTC 2025
-Data size: 7.5M	/home/shubham/page_replacement_project/data/memory_data_20251007_145215

@@ -1,1 +1,0 @@
-savedcmd_/media/sf_linux/kernel_experiments/major_fault_tracker/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /media/sf_linux/kernel_experiments/major_fault_tracker/Module.symvers -T /media/sf_linux/kernel_experiments/major_fault_tracker/modules.order -i Module.symvers -e 

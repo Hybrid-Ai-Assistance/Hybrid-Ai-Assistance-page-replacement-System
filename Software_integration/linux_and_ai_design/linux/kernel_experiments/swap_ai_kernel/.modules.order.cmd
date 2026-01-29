@@ -1,1 +1,0 @@
-savedcmd_/media/sf_linux/kernel_experiments/swap_ai_kernel/modules.order := {   echo /media/sf_linux/kernel_experiments/swap_ai_kernel/swap_ai_bridge.o; :; } > /media/sf_linux/kernel_experiments/swap_ai_kernel/modules.order

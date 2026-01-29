@@ -1,1 +1,0 @@
-savedcmd_/media/sf_linux/kernel_experiments/swap_ai_kernel/swap_ai_bridge.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /media/sf_linux/kernel_experiments/swap_ai_kernel/swap_ai_bridge.ko /media/sf_linux/kernel_experiments/swap_ai_kernel/swap_ai_bridge.o /media/sf_linux/kernel_experiments/swap_ai_kernel/swap_ai_bridge.mod.o

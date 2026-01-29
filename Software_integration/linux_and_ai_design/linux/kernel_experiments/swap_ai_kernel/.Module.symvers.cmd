@@ -1,1 +1,0 @@
-savedcmd_/media/sf_linux/kernel_experiments/swap_ai_kernel/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /media/sf_linux/kernel_experiments/swap_ai_kernel/Module.symvers -T /media/sf_linux/kernel_experiments/swap_ai_kernel/modules.order -i Module.symvers -e 

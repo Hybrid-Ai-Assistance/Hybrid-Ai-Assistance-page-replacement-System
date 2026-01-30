@@ -7,6 +7,10 @@
   <img src="https://img.shields.io/badge/Status-Research_Project-orange" alt="Status">
 </p>
 
+<p align="center">
+  <img src="https://via.placeholder.com/800x300/2d3748/ffffff?text=Hybrid+AI-Assisted+Page+Replacement+System" alt="Banner Image" width="800">
+</p>
+
 ## 📋 Overview
 
 **Hybrid AI-Assisted Page Replacement System** is a research project that enhances Linux memory management using predictive AI. Instead of replacing traditional algorithms (like [LRU](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)) or [CLOCK](https://en.wikipedia.org/wiki/Page_replacement_algorithm#Clock)), we add an **intelligent advisory layer** that predicts major page faults before they happen.
@@ -31,23 +35,25 @@ sudo insmod pfn_tracker.ko
 
 ## 📊 How It Works
 
-### Traditional Approach (Reactive)
-Traditional systems wait for page faults, then react:
-```
-Page Fault → Disk I/O → Load Page → Continue
-       ⬇
-High Latency (100-1000x slower)
-```
+### Traditional vs Predictive Approach
 
-### Our Approach (Predictive)
-We predict faults *before* they occur:
-```
-PFN Pattern Analysis → AI Prediction → Advisory Signal → Smarter Eviction
-       ⬇
-Avoid unnecessary disk I/O
-```
+<p align="center">
+  <img src="https://via.placeholder.com/700x200/1a202c/ffffff?text=Traditional:+Page+Fault+→+Disk+I/O+→+Load+Page+→+Continue" alt="Traditional Approach" width="700">
+  <br>
+  <em>Traditional systems wait for page faults, then react (100-1000x slower)</em>
+</p>
+
+<p align="center">
+  <img src="https://via.placeholder.com/700x200/2d3748/ffffff?text=Predictive:+PFN+Analysis+→+AI+Prediction+→+Advisory+Signal+→+Smarter+Eviction" alt="Predictive Approach" width="700">
+  <br>
+  <em>We predict faults BEFORE they occur to avoid unnecessary disk I/O</em>
+</p>
 
 ## 🏗️ System Architecture
+
+<p align="center">
+  <img src="https://via.placeholder.com/600x400/4a5568/ffffff?text=System+Architecture+Diagram" alt="System Architecture" width="600">
+</p>
 
 ```
     Linux Kernel
@@ -81,6 +87,10 @@ Reduced Major Faults
 
 ## ⚙️ Tech Stack
 
+<p align="center">
+  <img src="https://via.placeholder.com/800x200/2d3748/ffffff?text=Tech+Stack:+Python+|+PyTorch+|+Linux+Kernel+|+React+|+Flask" alt="Tech Stack" width="800">
+</p>
+
 | Component | Technology |
 |-----------|------------|
 | **AI/ML** | Python, PyTorch/TensorFlow, Scikit-learn |
@@ -98,11 +108,19 @@ Reduced Major Faults
 - Captures: `do_swap_page()`, `finish_fault()`, `shrink_folio_list()`
 - Tracks: Virtual Address → PFN mappings, process context, timing data
 
+<p align="center">
+  <img src="https://via.placeholder.com/500x150/4a5568/ffffff?text=Kernel+Instrumentation+Diagram" alt="Kernel Instrumentation" width="500">
+</p>
+
 ### 2. **AI Prediction Engine (GRU V3)**
 - **Model**: [Gated Recurrent Unit](https://en.wikipedia.org/wiki/Gated_recurrent_unit) (lightweight alternative to LSTM)
 - **Input**: 30-step PFN sequence window
 - **Output**: Predicted future PFNs + confidence scores
 - **Why GRU?**: Better temporal pattern capture with lower overhead
+
+<p align="center">
+  <img src="https://via.placeholder.com/500x150/4a5568/ffffff?text=GRU+V3+Model+Architecture" alt="GRU Model" width="500">
+</p>
 
 ### 3. **Hybrid Advisory Layer**
 - **Does NOT override** kernel decisions
@@ -111,6 +129,10 @@ Reduced Major Faults
 - Maintains kernel safety and compatibility
 
 ## 📈 Performance Benefits
+
+<p align="center">
+  <img src="https://via.placeholder.com/700x300/2d3748/ffffff?text=Performance+Comparison+Graph" alt="Performance Graph" width="700">
+</p>
 
 | Metric | Before | After (Expected) |
 |--------|--------|------------------|
@@ -123,6 +145,10 @@ Reduced Major Faults
 
 This project addresses a fundamental OS challenge: **Major Page Faults** are expensive because they require disk access (mechanical latency). Our system learns application memory patterns to avoid evicting pages that will soon be needed.
 
+<p align="center">
+  <img src="https://via.placeholder.com/600x200/1a202c/ffffff?text=Memory+Access+Patterns+Visualization" alt="Memory Patterns" width="600">
+</p>
+
 **Learn more about:**
 - [Virtual Memory](https://en.wikipedia.org/wiki/Virtual_memory) - How OS manages memory abstraction
 - [Page Replacement Algorithms](https://en.wikipedia.org/wiki/Page_replacement_algorithm) - Traditional approaches
@@ -130,6 +156,10 @@ This project addresses a fundamental OS challenge: **Major Page Faults** are exp
 - [Major vs Minor Faults](https://www.geeksforgeeks.org/page-fault-handling-in-operating-system/) - Understanding the cost difference
 
 ## 📁 Project Structure
+
+<p align="center">
+  <img src="https://via.placeholder.com/600x400/4a5568/ffffff?text=Project+Directory+Structure" alt="Project Structure" width="600">
+</p>
 
 ```
 ├── linux_and_ai_design/          # Core AI+Linux integration
@@ -173,12 +203,20 @@ Major Fault at VA: 0x7f8a1b402000
 → Timestamp: 164879.512 ms
 ```
 
+<p align="center">
+  <img src="https://via.placeholder.com/400x100/2d3748/ffffff?text=Data+Collection+Process" alt="Data Collection" width="400">
+</p>
+
 ### Step 2: Sequence Building
 ```
 Chrome Process PFN Sequence:
 [0x12340, 0x12341, 0x12342, 0x12345, ...]
 Window: 30 steps → Next: 0x12346 (predicted)
 ```
+
+<p align="center">
+  <img src="https://via.placeholder.com/400x100/2d3748/ffffff?text=Sequence+Building+Visualization" alt="Sequence Building" width="400">
+</p>
 
 ### Step 3: AI Prediction
 ```python
@@ -187,6 +225,10 @@ model = GRU(input_size=256, hidden_size=512)
 predicted_pfns = model(pfn_sequence)
 confidence = calculate_confidence(predicted_pfns)
 ```
+
+<p align="center">
+  <img src="https://via.placeholder.com/400x100/2d3748/ffffff?text=AI+Prediction+Visualization" alt="AI Prediction" width="400">
+</p>
 
 ### Step 4: Advisory Signal
 ```
@@ -197,6 +239,10 @@ Advisory: "PFN 0x12346 likely needed soon"
 
 ## 🎓 Academic Background
 
+<p align="center">
+  <img src="https://via.placeholder.com/500x200/4a5568/ffffff?text=Research+Project+2025-2026" alt="Academic Background" width="500">
+</p>
+
 **Final Year Research Project (2025-2026)**  
 Department of Computer Science & Engineering
 
@@ -204,15 +250,25 @@ Department of Computer Science & Engineering
 - **Mr. R. S. Sharma** - Head of Department
 - **Ms. Mithilesh Sharma** - Faculty, CS Department
 
-### Research Team:
-| Name | ID |
-|------|----|
-| Hemant Singh Chouhan | 22/420 | 
+### Research Team (Collaborative Effort):
+<p align="center">
+  <img src="https://via.placeholder.com/600x150/2d3748/ffffff?text=Team+Collaboration+Diagram" alt="Team Collaboration" width="600">
+</p>
+
+| Name | Student ID |
+|------|------------|
+| Hemant Singh Chouhan | 22/420 |
 | Naresh Parmar | 22/519 |
-| Naman Sehra | 22/518 | 
-| Shubham Garg | 23/776 | 
+| Naman Sehra | 22/518 |
+| Shubham Garg | 23/776 |
+
+*All team members contributed equally across system architecture, kernel development, AI model design, and data pipeline implementation.*
 
 ## 🚀 How to Contribute
+
+<p align="center">
+  <img src="https://via.placeholder.com/700x200/1a202c/ffffff?text=Contribution+Workflow+Diagram" alt="Contribution Workflow" width="700">
+</p>
 
 ### Role-Based Contribution Workflow
 
@@ -270,6 +326,10 @@ Department of Computer Science & Engineering
 ## 📚 Learning Resources
 
 ### Prerequisites (Recommended Reading)
+<p align="center">
+  <img src="https://via.placeholder.com/700x150/4a5568/ffffff?text=Learning+Resources+and+References" alt="Learning Resources" width="700">
+</p>
+
 1. **Memory Management Basics**
    - [Virtual Memory Explained](https://www.techtarget.com/searchstorage/definition/virtual-memory)
    - [Page Tables and MMU](https://en.wikipedia.org/wiki/Memory_management_unit)
@@ -288,6 +348,10 @@ Department of Computer Science & Engineering
    - [Temporal Pattern Recognition](https://en.wikipedia.org/wiki/Time_series)
 
 ## 🚧 Installation & Setup
+
+<p align="center">
+  <img src="https://via.placeholder.com/600x200/2d3748/ffffff?text=Installation+Process+Flow" alt="Installation Process" width="600">
+</p>
 
 ### Requirements
 - Linux Kernel 5.4+
@@ -333,6 +397,10 @@ cd ../../web_platform && npm run dev
 
 ## 📊 Evaluation & Results
 
+<p align="center">
+  <img src="https://via.placeholder.com/800x300/1a202c/ffffff?text=Performance+Evaluation+Results+and+Metrics" alt="Evaluation Results" width="800">
+</p>
+
 ### Test Workloads
 We evaluate using:
 - **Memory-intensive applications** (Chrome, MATLAB, VMs)
@@ -347,6 +415,10 @@ We evaluate using:
 - **Latency Improvement**: Reduced 95th percentile response times
 
 ## 🔮 Future Work
+
+<p align="center">
+  <img src="https://via.placeholder.com/700x200/4a5568/ffffff?text=Future+Research+Directions+and+Enhancements" alt="Future Work" width="700">
+</p>
 
 1. **Real-time Kernel Integration**
    - Move from userspace to kernelspace advisory
@@ -373,11 +445,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact & Support
 
+<p align="center">
+  <img src="https://via.placeholder.com/600x100/2d3748/ffffff?text=Contact+and+Support+Information" alt="Contact" width="600">
+</p>
+
 - **GitHub Issues**: [Report bugs or request features](https://github.com/Hybrid-Ai-Assistance/Hybrid-Ai-Assistance-page-replacement-System/issues)
 - **Role-specific Discussions**: Check respective directory README files
 - **Academic Inquiries**: Contact via university department
 
 ## 🙏 Acknowledgments
+
+<p align="center">
+  <img src="https://via.placeholder.com/700x150/1a202c/ffffff?text=Acknowledgments+and+Special+Thanks" alt="Acknowledgments" width="700">
+</p>
 
 - Our faculty supervisors for guidance and support
 - Linux kernel community for excellent documentation
@@ -405,3 +485,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     <img src="https://img.shields.io/github/license/Hybrid-Ai-Assistance/Hybrid-Ai-Assistance-page-replacement-System" alt="License">
   </a>
 </p>
+
